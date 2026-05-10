@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>YTA Tools — YouTube AI Automation</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
+<style>
+:root{
+  --red:#FF0000;--red2:#cc0000;--red3:#fff0f0;
+  --bg:#f0f0f0;--surf:#fff;--surf2:#f8f8f8;
+  --bord:#e2e2e2;--bord2:#ececec;
+  --txt:#111;--txt2:#555;--txt3:#999;
+  --grn:#1a6b1a;--grn2:#e8f5e8;
+  --amb:#7a4500;--amb2:#fff3e0;
+  --blu:#0a4f8a;--blu2:#e8f1fb;
+  --rad:10px;--rad2:16px;
+  --side:220px;--head:54px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--txt);overflow-x:hidden}
+
+/* ── HEADER ── */
+.hdr{height:var(--head);background:var(--surf);border-bottom:1px solid var(--bord);display:flex;align-items:center;padding:0 20px;gap:12px;position:fixed;top:0;left:0;right:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.hdr-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.hdr-icon{width:32px;height:32px;background:var(--red);border-radius:8px;display:flex;align-items:center;justify-content:center}
+.hdr-icon i{color:#fff;font-size:18px}
+.hdr-name{font-size:15px;font-weight:700;color:var(--txt)}
+.hdr-tag{font-size:11px;color:var(--txt3);margin-top:1px}
+.hdr-spacer{flex:1}
+.hdr-yt-btn{display:flex;align-items:center;gap:7px;padding:7px 16px;border-radius:var(--rad);border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .15s}
+.hdr-yt-btn.login{background:var(--red);color:#fff}
+.hdr-yt-btn.login:hover{background:var(--red2)}
+.hdr-yt-btn.user{background:var(--surf2);border:1px solid var(--bord);color:var(--txt)}
+.hdr-yt-btn.user img{width:24px;height:24px;border-radius:50%}
+.hdr-analytics-link{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--rad);background:var(--blu2);color:var(--blu);font-size:13px;font-weight:600;text-decoration:none;border:1px solid #c5daf5}
+.hdr-analytics-link:hover{background:#d5e8f8}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;top:var(--head);left:0;width:var(--side);height:calc(100vh - var(--head));background:var(--surf);border-right:1px solid var(--bord);overflow-y:auto;z-index:90}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;cursor:pointer;color:var(--txt2);font-size:13px;border-left:3px solid transparent;transition:all .12s;user-select:none}
+.nav-item:hover{background:var(--bg);color:var(--txt)}
+.nav-item.active{background:var(--red3);color:var(--red);border-left-color:var(--red);font-weight:600}
+.nav-item i{font-size:19px;flex-shrink:0;width:22px;text-align:center}
+.nav-section{padding:14px 18px 4px;font-size:10px;font-weight:700;color:var(--txt3);letter-spacing:.08em;text-transform:uppercase}
+.nav-divider{height:1px;background:var(--bord2);margin:6px 0}
+
+/* ── MAIN ── */
+.main{margin-left:var(--side);margin-top:var(--head);padding:28px;min-height:calc(100vh - var(--head))}
+.panel{display:none}
+.panel.active{display:block}
+.p-title{font-size:20px;font-weight:700;margin-bottom:4px}
+.p-desc{font-size:13px;color:var(--txt2);margin-bottom:22px;line-height:1.6}
+
+/* ── FORMS ── */
+.field{margin-bottom:13px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--txt2);margin-bottom:5px}
+.field input,.field textarea,.field select{width:100%;padding:9px 12px;border-radius:var(--rad);border:1px solid var(--bord);background:var(--surf);color:var(--txt);font-size:13px;font-family:inherit;transition:border-color .15s,box-shadow .15s;resize:vertical}
+.field textarea{min-height:80px}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px rgba(255,0,0,.08)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* ── CHIPS ── */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.chip{padding:4px 13px;border-radius:20px;border:1px solid var(--bord);font-size:12px;cursor:pointer;background:var(--surf);color:var(--txt2);transition:all .12s;user-select:none}
+.chip:hover,.chip.on{border-color:var(--red);color:var(--red);background:var(--red3)}
+
+/* ── BUTTONS ── */
+.btn{padding:10px 22px;border-radius:var(--rad);border:none;background:var(--red);color:#fff;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:all .15s}
+.btn:hover{background:var(--red2)}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-g{background:var(--surf);color:var(--txt2);border:1px solid var(--bord)}
+.btn-g:hover{background:var(--bg)}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* ── RESULT BOX ── */
+.res-box{margin-top:16px;background:var(--surf2);border-radius:var(--rad2);border:1px solid var(--bord);padding:16px;min-height:72px}
+.res-empty{color:var(--txt3);font-size:12px;font-style:italic}
+.res-content{font-size:13px;line-height:1.85;white-space:pre-wrap;color:var(--txt)}
+.res-actions{display:none;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--bord)}
+.res-actions.on{display:flex}
+
+/* ── IMAGE RESULT ── */
+.img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:14px}
+.img-card{border-radius:var(--rad);overflow:hidden;border:1px solid var(--bord);background:var(--surf2)}
+.img-card img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.img-card-label{padding:6px 10px;font-size:11px;color:var(--txt2);text-align:center}
+
+/* ── STYLE SELECTOR ── */
+.style-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}
+.style-opt{border-radius:var(--rad);border:2px solid var(--bord);background:var(--surf2);padding:10px 6px;text-align:center;cursor:pointer;transition:all .15s;user-select:none}
+.style-opt:hover{border-color:#ccc}
+.style-opt.on{border-color:var(--red);background:var(--red3)}
+.style-opt i{font-size:24px;color:var(--txt2);display:block;margin-bottom:4px}
+.style-opt.on i{color:var(--red)}
+.style-opt span{font-size:11px;font-weight:600;color:var(--txt2)}
+.style-opt.on span{color:var(--red)}
+
+/* ── SCHEDULER ── */
+.schedule-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.sched-card{background:var(--surf);border:1px solid var(--bord);border-radius:var(--rad2);padding:16px}
+.sched-card h3{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.sched-card h3 i{color:var(--red)}
+.sched-week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:10px}
+.sched-day{background:var(--surf2);border-radius:6px;padding:6px 3px;text-align:center;font-size:10px;color:var(--txt3);cursor:pointer;border:1px solid var(--bord);transition:all .12s;user-select:none}
+.sched-day.on{background:var(--red3);border-color:var(--red);color:var(--red);font-weight:700}
+.sched-day .d-name{font-weight:600}
+.sched-day .d-icon{font-size:16px;margin-top:3px}
+.upload-area{border:2px dashed var(--bord);border-radius:var(--rad);padding:32px;text-align:center;cursor:pointer;transition:all .15s;background:var(--surf2)}
+.upload-area:hover,.upload-area.drag{border-color:var(--red);background:var(--red3)}
+.upload-area i{font-size:36px;color:var(--txt3);margin-bottom:8px;display:block}
+.upload-area p{font-size:13px;color:var(--txt2)}
+.upload-area small{font-size:11px;color:var(--txt3)}
+.progress-bar{height:6px;background:var(--bord);border-radius:3px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;background:var(--red);border-radius:3px;width:0%;transition:width .3s}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;right:20px;background:#1a1a1a;color:#fff;padding:10px 18px;border-radius:var(--rad);font-size:13px;display:flex;align-items:center;gap:7px;z-index:9999;transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none}
+.toast.on{transform:translateY(0);opacity:1}
+.toast.ok{background:#1a6b1a}
+.toast.err{background:#a32d2d}
+
+/* ── SPINNER ── */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ── MISC ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-g{background:var(--grn2);color:var(--grn)}
+.badge-a{background:var(--amb2);color:var(--amb)}
+.badge-b{background:var(--blu2);color:var(--blu)}
+.badge-r{background:var(--red3);color:var(--red)}
+.card{background:var(--surf);border:1px solid var(--bord);border-radius:var(--rad2);padding:18px}
+.divider{height:1px;background:var(--bord);margin:18px 0}
+.section-lbl{font-size:11px;font-weight:700;color:var(--txt3);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px}
+.info-box{background:var(--blu2);border:1px solid #c5daf5;border-radius:var(--rad);padding:12px 14px;font-size:12px;color:var(--blu);margin-bottom:14px;display:flex;gap:8px}
+.info-box i{font-size:16px;flex-shrink:0;margin-top:1px}
+.warn-box{background:var(--amb2);border:1px solid #f5c97a;border-radius:var(--rad);padding:12px 14px;font-size:12px;color:var(--amb);margin-bottom:14px;display:flex;gap:8px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);transition:transform .2s}
+  .sidebar.open{transform:none}
+  .main{margin-left:0}
+  .row2,.row3{grid-template-columns:1fr}
+  .style-grid{grid-template-columns:repeat(3,1fr)}
+  .schedule-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header class="hdr">
+  <a class="hdr-logo" href="#">
+    <div class="hdr-icon"><i class="ti ti-brand-youtube"></i></div>
+    <div><div class="hdr-name">YTA Tools</div><div class="hdr-tag">YouTube AI Automation</div></div>
+  </a>
+  <div class="hdr-spacer"></div>
+  <a class="hdr-analytics-link" href="analytics.html"><i class="ti ti-chart-bar"></i> Analytics</a>
+  &nbsp;
+  <button class="hdr-yt-btn login" id="yt-login-btn" onclick="ytLogin()">
+    <i class="ti ti-brand-youtube"></i> Connect YouTube
+  </button>
+  <div id="yt-user-display" style="display:none">
+    <button class="hdr-yt-btn user" id="yt-user-btn">
+      <img id="yt-avatar" src="" alt=""/>
+      <span id="yt-uname"></span>
+      <i class="ti ti-chevron-down" style="font-size:14px"></i>
+    </button>
+  </div>
+</header>
+
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<nav class="sidebar" id="sidebar">
+  <div class="nav-section">Tools</div>
+  <div class="nav-item active" onclick="go('niche')"><i class="ti ti-search"></i>Niche Finder</div>
+  <div class="nav-item" onclick="go('scenario')"><i class="ti ti-movie"></i>Scenario + Hook</div>
+  <div class="nav-item" onclick="go('character')"><i class="ti ti-mood-smile"></i>Character Gen</div>
+  <div class="nav-item" onclick="go('p2v')"><i class="ti ti-video"></i>Prompt to Video</div>
+  <div class="nav-item" onclick="go('voice')"><i class="ti ti-microphone"></i>My Voice to AI</div>
+  <div class="nav-item" onclick="go('titledesc')"><i class="ti ti-pencil"></i>Title & Description</div>
+  <div class="nav-item" onclick="go('thumbnail')"><i class="ti ti-photo"></i>Thumbnail</div>
+  <div class="nav-item" onclick="go('copyright')"><i class="ti ti-shield-check"></i>Copyright Check</div>
+  <div class="nav-divider"></div>
+  <div class="nav-section">Automation</div>
+  <div class="nav-item" onclick="go('autopost')"><i class="ti ti-send"></i>Auto-Post</div>
+</nav>
+
+<!-- ═══════════════════ MAIN CONTENT ═══════════════════ -->
+<main class="main">
+
+<!-- ────────── NICHE FINDER ────────── -->
+<div class="panel active" id="p-niche">
+  <div class="p-title">Profitable Niche Finder</div>
+  <div class="p-desc">Hanapin ang pinaka-profitable na niche para sa iyong YouTube channel base sa iyong interests, skills, at market demand.</div>
+  <div class="row2">
+    <div class="field"><label>Mga interest mo (separate by comma)</label><input id="nf-interests" placeholder="e.g. gaming, magluto, finance, pets..."/></div>
+    <div class="field"><label>Skills mo</label><input id="nf-skills" placeholder="e.g. editing, nakakapagturo, funny, may koneksyon..."/></div>
+  </div>
+  <div class="row3">
+    <div class="field"><label>Available time para mag-create</label>
+      <select id="nf-time"><option>1-2 hrs/week</option><option>3-5 hrs/week</option><option selected>5-10 hrs/week</option><option>10+ hrs/week</option></select>
+    </div>
+    <div class="field"><label>Budget para sa equipment</label>
+      <select id="nf-budget"><option>Libre (phone lang)</option><option selected>Maliit (₱5k-20k)</option><option>Medium (₱20k-50k)</option><option>Malaki (50k+)</option></select>
+    </div>
+    <div class="field"><label>Monetization priority</label>
+      <select id="nf-priority"><option selected>Pinakamabilis na kumita</option><option>Long-term growth</option><option>Passion first</option></select>
+    </div>
+  </div>
+  <div class="section-lbl">Popular niches sa Philippines</div>
+  <div class="chips">
+    <span class="chip" onclick="chip(this,'nf-interests')">Gaming</span>
+    <span class="chip" onclick="chip(this,'nf-interests')">Kain / Mukbang</span>
+    <span class="chip" onclick="chip(this,'nf-interests')">Negosyo</span>
+    <span class="chip" onclick="chip(this,'nf-interests')">Beauty</span>
+    <span class="chip" onclick="chip(this,'nf-interests')">Vlog</span>
+    <span class="chip" onclick="chip(this,'nf-interests')">Tech</span>
+    <span class="chip" onclick="chip(this,'nf-interests')">Comedy</span>
+    <span class="chip" onclick="chip(this,'nf-interests')">Education</span>
+    <span class="chip" onclick="chip(this,'nf-interests')">Sports</span>
+    <span class="chip" onclick="chip(this,'nf-interests')">Health</span>
+  </div>
+  <button class="btn" id="btn-niche" onclick="gen('niche')"><i class="ti ti-sparkles"></i> Find My Profitable Niche</button>
+  <div class="res-box" id="res-niche"><div class="res-empty">I-fill ang iyong interests at skills tapos i-click ang button...</div></div>
+  <div class="res-actions" id="cp-niche"><button class="btn btn-g btn-sm" onclick="copyRes('res-niche',this)"><i class="ti ti-copy"></i> Copy</button></div>
+</div>
+
+<!-- ────────── SCENARIO + HOOK ────────── -->
+<div class="panel" id="p-scenario">
+  <div class="p-title">Scenario + Hook Generator</div>
+  <div class="p-desc">Gumawa ng powerful hook sa 3-6 seconds at full video scenario/script na magpapanatili ng viewers hanggang dulo.</div>
+  <div class="field"><label>Video concept o topic</label><input id="sc-concept" placeholder="e.g. Nag-quit ako sa trabaho para mag-YouTube, ganito nangyari..."/></div>
+  <div class="row3">
+    <div class="field"><label>Video format</label>
+      <select id="sc-format"><option>Story time</option><option>Challenge</option><option>Tutorial</option><option>Reaction</option><option>Skit/Comedy</option><option>Vlog</option><option>Review</option><option>Documentary</option></select>
+    </div>
+    <div class="field"><label>Target length</label>
+      <select id="sc-len"><option>Shorts (under 60s)</option><option>Short (3-5 mins)</option><option selected>Medium (8-12 mins)</option><option>Long (15-20 mins)</option></select>
+    </div>
+    <div class="field"><label>Tone</label>
+      <select id="sc-tone"><option selected>Funny & entertaining</option><option>Inspiring</option><option>Informative</option><option>Emotional</option><option>Chill/Conversational</option><option>Suspenseful</option></select>
+    </div>
+  </div>
+  <div class="field"><label>Main message para sa viewers</label><input id="sc-msg" placeholder="e.g. Kahit mahirap, kaya mo rin ito..."/></div>
+  <div class="info-box"><i class="ti ti-info-circle"></i><div>Ang hook sa <strong>unang 3-6 segundo</strong> ang pinaka-importanteng part ng video. Ito ang magde-decide kung mananatili o mag-i-scroll ang viewer.</div></div>
+  <button class="btn" id="btn-scenario" onclick="gen('scenario')"><i class="ti ti-sparkles"></i> Generate Hook + Full Script</button>
+  <div class="res-box" id="res-scenario"><div class="res-empty">I-describe ang video concept mo tapos i-generate ang script na may killer hook...</div></div>
+  <div class="res-actions" id="cp-scenario"><button class="btn btn-g btn-sm" onclick="copyRes('res-scenario',this)"><i class="ti ti-copy"></i> Copy</button></div>
+</div>
+
+<!-- ────────── CHARACTER GENERATOR ────────── -->
+<div class="panel" id="p-character">
+  <div class="p-title">Character Generator</div>
+  <div class="p-desc">I-create ang iyong YouTube character at i-visualize ito sa iba't ibang art styles gamit ang AI image generation.</div>
+
+  <div class="section-lbl">Art Style</div>
+  <div class="style-grid" id="char-styles">
+    <div class="style-opt on" data-style="2D Cartoon" onclick="selStyle(this)"><i class="ti ti-brush"></i><span>2D Cartoon</span></div>
+    <div class="style-opt" data-style="3D Render" onclick="selStyle(this)"><i class="ti ti-cube"></i><span>3D Render</span></div>
+    <div class="style-opt" data-style="Clay/Claymation" onclick="selStyle(this)"><i class="ti ti-circle"></i><span>Clay</span></div>
+    <div class="style-opt" data-style="Retro/Pixel Art" onclick="selStyle(this)"><i class="ti ti-device-gamepad"></i><span>Retro/Pixel</span></div>
+    <div class="style-opt" data-style="Anime/Manga" onclick="selStyle(this)"><i class="ti ti-star"></i><span>Anime</span></div>
+  </div>
+
+  <div class="row2">
+    <div class="field"><label>Channel name / Character name</label><input id="ch-name" placeholder="e.g. KuyaRon, Pixel Boy, AniMaster..."/></div>
+    <div class="field"><label>Niche ng channel</label><input id="ch-niche" placeholder="e.g. gaming, food, comedy..."/></div>
+  </div>
+  <div class="row2">
+    <div class="field"><label>Personality ng character</label><input id="ch-personality" placeholder="e.g. funny, cool, mysterious, energetic..."/></div>
+    <div class="field"><label>Signature colors (optional)</label><input id="ch-colors" placeholder="e.g. red and black, pastel pink, neon green..."/></div>
+  </div>
+  <div class="field"><label>Special features o accessories</label><input id="ch-features" placeholder="e.g. headphones, glasses, cape, gaming chair, chef hat..."/></div>
+
+  <button class="btn" id="btn-char-img" onclick="genCharImage()"><i class="ti ti-photo"></i> Generate Character Images</button>
+  &nbsp;
+  <button class="btn btn-g" id="btn-char-guide" onclick="gen('character')"><i class="ti ti-sparkles"></i> Generate Brand Guide</button>
+
+  <div id="char-img-area" style="display:none">
+    <div class="section-lbl" style="margin-top:16px">Generated Character Concepts</div>
+    <div class="img-grid" id="char-img-grid"></div>
+    <div class="info-box" style="margin-top:12px"><i class="ti ti-info-circle"></i><div>Para sa mas detalyadong image, gamitin ang generated prompts sa <strong>Midjourney, DALL-E, o Adobe Firefly</strong>.</div></div>
+  </div>
+
+  <div class="res-box" id="res-character" style="margin-top:14px"><div class="res-empty">I-click ang "Generate Brand Guide" para makakuha ng full character description, voice style, at content pillars...</div></div>
+  <div class="res-actions" id="cp-character"><button class="btn btn-g btn-sm" onclick="copyRes('res-character',this)"><i class="ti ti-copy"></i> Copy</button></div>
+</div>
+
+<!-- ────────── PROMPT TO VIDEO ────────── -->
+<div class="panel" id="p-p2v">
+  <div class="p-title">Prompt to Video</div>
+  <div class="p-desc">I-generate ang optimized na video prompts para sa AI video tools (Runway, Pika, Sora, Kling). Kasama ang shot-by-shot breakdown at camera direction.</div>
+  <div class="row2">
+    <div class="field"><label>Video concept / idea</label><input id="p2v-concept" placeholder="e.g. Isang batang naglalaro sa ulan sa probinsya ng Pilipinas..."/></div>
+    <div class="field"><label>Video style</label>
+      <select id="p2v-style"><option>Cinematic / Film</option><option>Vlog / Handheld</option><option>Animation</option><option>Documentary</option><option>Music video</option><option>Commercial/Ad</option></select>
+    </div>
+  </div>
+  <div class="row3">
+    <div class="field"><label>Mood / Atmosphere</label><input id="p2v-mood" placeholder="e.g. nostalgic, exciting, dark, happy..."/></div>
+    <div class="field"><label>Duration target</label>
+      <select id="p2v-dur"><option>Short (15-30s)</option><option selected>Medium (60s)</option><option>Long (2-5 mins)</option></select>
+    </div>
+    <div class="field"><label>AI tool na gagamitin</label>
+      <select id="p2v-tool"><option>Runway Gen-4</option><option>Pika 2.0</option><option>Kling AI</option><option>Sora (OpenAI)</option><option>Veo 2 (Google)</option><option>Any / General</option></select>
+    </div>
+  </div>
+
+  <div class="section-lbl">AI Video Tools</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+    <a href="https://runwayml.com" target="_blank" class="btn btn-g btn-sm"><i class="ti ti-external-link"></i> Runway</a>
+    <a href="https://pika.art" target="_blank" class="btn btn-g btn-sm"><i class="ti ti-external-link"></i> Pika</a>
+    <a href="https://klingai.com" target="_blank" class="btn btn-g btn-sm"><i class="ti ti-external-link"></i> Kling</a>
+    <a href="https://sora.com" target="_blank" class="btn btn-g btn-sm"><i class="ti ti-external-link"></i> Sora</a>
+  </div>
+
+  <button class="btn" id="btn-p2v" onclick="gen('p2v')"><i class="ti ti-sparkles"></i> Generate Video Prompts</button>
+  <div class="res-box" id="res-p2v"><div class="res-empty">I-describe ang gusto mong video tapos makakuha ng optimized na prompts para sa AI video tools...</div></div>
+  <div class="res-actions" id="cp-p2v"><button class="btn btn-g btn-sm" onclick="copyRes('res-p2v',this)"><i class="ti ti-copy"></i> Copy Prompts</button></div>
+</div>
+
+<!-- ────────── VOICE TO AI ────────── -->
+<div class="panel" id="p-voice">
+  <div class="p-title">Copy My Voice to AI</div>
+  <div class="p-desc">I-analyze ang iyong natural na paraan ng pagsasalita at gumawa ng AI voice style guide + prompts na laging consistent ang iyong boses sa lahat ng content.</div>
+  <div class="field"><label>Isulat kung paano ka nagsasalita (natural lang, huwag mag-edit)</label>
+    <textarea id="v-sample" style="min-height:100px" placeholder="e.g. 'Ay grabe guys! Di ko talaga inakala na ganito pala! Promise, noong una akala ko scam lang ito kaso nagustuhan ko talaga kasi... so basically ano bang nangyari? Okay so ganito...'"></textarea>
+  </div>
+  <div class="row3">
+    <div class="field"><label>Niche mo</label><input id="v-niche" placeholder="e.g. food, gaming, lifestyle..."/></div>
+    <div class="field"><label>Idol mong YouTuber (optional)</label><input id="v-inspo" placeholder="e.g. Cong TV, Zeinab, etc."/></div>
+    <div class="field"><label>Language preference</label>
+      <select id="v-lang"><option selected>Taglish</option><option>Pure Tagalog</option><option>Mostly English + Filipino slang</option><option>Bisaya mix</option></select>
+    </div>
+  </div>
+
+  <div class="info-box"><i class="ti ti-microphone"></i><div>Para sa actual na voice cloning (AI na nagsasalita sa iyong boses), gamitin ang <strong>ElevenLabs</strong> — libre ang 10,000 characters/month. <a href="https://elevenlabs.io" target="_blank" style="color:var(--blu)">elevenlabs.io →</a></div></div>
+
+  <button class="btn" id="btn-voice" onclick="gen('voice')"><i class="ti ti-sparkles"></i> Analyze Voice + Create AI Style Guide</button>
+  <div class="res-box" id="res-voice"><div class="res-empty">I-type ang voice sample mo tapos makakuha ng complete AI voice style guide...</div></div>
+  <div class="res-actions" id="cp-voice"><button class="btn btn-g btn-sm" onclick="copyRes('res-voice',this)"><i class="ti ti-copy"></i> Copy</button></div>
+</div>
+
+<!-- ────────── TITLE & DESCRIPTION ────────── -->
+<div class="panel" id="p-titledesc">
+  <div class="p-title">Title & Description Generator</div>
+  <div class="p-desc">Gumawa ng SEO-optimized titles na may mataas na click-through rate at full video description na may hashtags at timestamps.</div>
+  <div class="field"><label>Video topic / content summary</label>
+    <textarea id="td-content" placeholder="e.g. Nag-try ako ng 7-day na extreme savings challenge — kumain lang ng ₱100/day. Ganito ang nangyari sa katawan ko at sa budget ko..."></textarea>
+  </div>
+  <div class="row3">
+    <div class="field"><label>Primary keyword</label><input id="td-kw1" placeholder="e.g. paano mag-ipon ng pera"/></div>
+    <div class="field"><label>Secondary keyword</label><input id="td-kw2" placeholder="e.g. budget tips Philippines"/></div>
+    <div class="field"><label>Title tone</label>
+      <select id="td-tone"><option selected>Catchy & curiosity-driven</option><option>Informative & clear</option><option>Funny & relatable</option><option>Emotional / inspiring</option></select>
+    </div>
+  </div>
+  <div class="row2">
+    <div class="field"><label>Video length (para sa timestamps)</label><input id="td-dur" placeholder="e.g. 10 minutes"/></div>
+    <div class="field"><label>Call to action</label>
+      <select id="td-cta"><option selected>Subscribe + Like + Comment</option><option>Subscribe + Share</option><option>Check related video</option><option>Follow sa socials</option></select>
+    </div>
+  </div>
+  <button class="btn" id="btn-titledesc" onclick="gen('titledesc')"><i class="ti ti-sparkles"></i> Generate 5 Titles + Full Description</button>
+  <div class="res-box" id="res-titledesc"><div class="res-empty">I-describe ang video mo tapos i-generate ang titles at SEO description...</div></div>
+  <div class="res-actions" id="cp-titledesc"><button class="btn btn-g btn-sm" onclick="copyRes('res-titledesc',this)"><i class="ti ti-copy"></i> Copy</button></div>
+</div>
+
+<!-- ────────── THUMBNAIL ────────── -->
+<div class="panel" id="p-thumbnail">
+  <div class="p-title">Thumbnail Generator</div>
+  <div class="p-desc">Gumawa ng high-CTR thumbnail concept at i-visualize gamit ang AI. Kasama ang exact layout, colors, at text overlay.</div>
+  <div class="row2">
+    <div class="field"><label>Video title / topic</label><input id="th-topic" placeholder="e.g. Nag-try ako ng ₱100 budget meal for 7 days..."/></div>
+    <div class="field"><label>Emotion na gusto mong ma-trigger</label><input id="th-emotion" placeholder="e.g. curious, shocked, excited, nakakaawa..."/></div>
+  </div>
+  <div class="row3">
+    <div class="field"><label>Thumbnail style</label>
+      <select id="th-style"><option>Shocked reaction face</option><option>Before & After</option><option>Bold text overlay</option><option>Minimalist</option><option>Split screen</option><option>Collage</option></select>
+    </div>
+    <div class="field"><label>Color scheme</label>
+      <select id="th-color"><option selected>Bright & energetic (red, yellow)</option><option>Dark & cinematic</option><option>Pastel / Aesthetic</option><option>High contrast B&W</option><option>Natural / Warm</option></select>
+    </div>
+    <div class="field"><label>Presenter in thumbnail?</label>
+      <select id="th-person"><option selected>Oo — reaction face ako</option><option>Hindi — text/graphics lang</option><option>May product/food</option><option>Before & after photos</option></select>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" id="btn-thumb-img" onclick="genThumbImage()"><i class="ti ti-photo"></i> Preview Thumbnail Concept</button>
+    <button class="btn btn-g" id="btn-thumb-text" onclick="gen('thumbnail')"><i class="ti ti-sparkles"></i> Get Detailed Design Guide</button>
+  </div>
+
+  <div id="thumb-img-area" style="display:none;margin-top:14px">
+    <div class="section-lbl">Thumbnail Preview (AI-generated concept)</div>
+    <div class="img-grid" id="thumb-img-grid"></div>
+  </div>
+
+  <div class="res-box" id="res-thumbnail" style="margin-top:14px"><div class="res-empty">I-click ang "Get Detailed Design Guide" para sa exact layout, hex colors, at Canva instructions...</div></div>
+  <div class="res-actions" id="cp-thumbnail"><button class="btn btn-g btn-sm" onclick="copyRes('res-thumbnail',this)"><i class="ti ti-copy"></i> Copy</button></div>
+</div>
+
+<!-- ────────── COPYRIGHT CHECKER ────────── -->
+<div class="panel" id="p-copyright">
+  <div class="p-title">Copyright Checker</div>
+  <div class="p-desc">I-check ang iyong content para sa copyright at factual issues BAGO mag-upload. Protektahan ang iyong channel mula sa strikes at demonetization.</div>
+  <div class="field"><label>I-paste ang content na gusto mong i-check</label>
+    <textarea id="cr-text" style="min-height:120px" placeholder="I-paste dito ang iyong script, lyrics na gagamitin, facts, statistics, o anumang content na gusto mong i-verify bago i-publish..."></textarea>
+  </div>
+  <div class="row2">
+    <div class="field"><label>Type ng content</label>
+      <select id="cr-type"><option>Video script / narration</option><option>Background music / audio</option><option>Facts / statistics</option><option>Video clips na gagamitin</option><option>Images mula sa internet</option><option>Song lyrics</option></select>
+    </div>
+    <div class="field"><label>Topic / subject</label><input id="cr-topic" placeholder="e.g. health, kasaysayan, balita, musika..."/></div>
+  </div>
+  <div class="warn-box"><i class="ti ti-alert-triangle"></i><div>Hindi ito legal advice. Para sa seryosong copyright concerns, kumonsulta sa lawyer o gumamit ng licensed content libraries tulad ng <strong>Epidemic Sound, Artlist, o Pixabay</strong>.</div></div>
+  <button class="btn" id="btn-copyright" onclick="gen('copyright')"><i class="ti ti-shield-check"></i> Check for Issues</button>
+  <div class="res-box" id="res-copyright"><div class="res-empty">I-paste ang content mo para ma-analyze ang possible na copyright at factual issues...</div></div>
+  <div class="res-actions" id="cp-copyright"><button class="btn btn-g btn-sm" onclick="copyRes('res-copyright',this)"><i class="ti ti-copy"></i> Copy Report</button></div>
+</div>
+
+<!-- ────────── AUTO-POST SCHEDULER ────────── -->
+<div class="panel" id="p-autopost">
+  <div class="p-title">Auto-Post Scheduler</div>
+  <div class="p-desc">I-schedule at i-upload ang iyong content sa YouTube — 1 long video at 3-7 shorts weekly. Automatic, repeat every week.</div>
+
+  <div id="autopost-noauth" style="display:block">
+    <div class="warn-box"><i class="ti ti-brand-youtube"></i><div>Kailangan mong i-connect ang iyong YouTube account para ma-use ang Auto-Post. I-click ang <strong>"Connect YouTube"</strong> sa itaas.</div></div>
+  </div>
+
+  <div id="autopost-auth" style="display:none">
+    <div class="schedule-grid">
+      <!-- Long Video -->
+      <div class="sched-card">
+        <h3><i class="ti ti-video"></i> Long Video (1x/week)</h3>
+        <div class="section-lbl">Upload Day</div>
+        <div class="sched-week" id="long-days">
+          <div class="sched-day" data-day="Mon" onclick="togDay(this,'long')"><div class="d-name">M</div><div class="d-icon">📅</div></div>
+          <div class="sched-day on" data-day="Tue" onclick="togDay(this,'long')"><div class="d-name">T</div><div class="d-icon">📅</div></div>
+          <div class="sched-day" data-day="Wed" onclick="togDay(this,'long')"><div class="d-name">W</div><div class="d-icon">📅</div></div>
+          <div class="sched-day" data-day="Thu" onclick="togDay(this,'long')"><div class="d-name">T</div><div class="d-icon">📅</div></div>
+          <div class="sched-day" data-day="Fri" onclick="togDay(this,'long')"><div class="d-name">F</div><div class="d-icon">📅</div></div>
+          <div class="sched-day" data-day="Sat" onclick="togDay(this,'long')"><div class="d-name">S</div><div class="d-icon">📅</div></div>
+          <div class="sched-day" data-day="Sun" onclick="togDay(this,'long')"><div class="d-name">S</div><div class="d-icon">📅</div></div>
+        </div>
+        <div class="field"><label>Upload Time</label><input type="time" id="long-time" value="09:00"/></div>
+        <div class="upload-area" id="long-drop" onclick="document.getElementById('long-file').click()" ondragover="dragOver(event,this)" ondragleave="dragLeave(this)" ondrop="handleDrop(event,'long')">
+          <i class="ti ti-cloud-upload"></i>
+          <p id="long-fn">I-click o i-drag ang long video dito</p>
+          <small>MP4, MOV, AVI • Max 128GB</small>
+          <div class="progress-bar" id="long-prog-bar" style="display:none"><div class="progress-fill" id="long-prog"></div></div>
+        </div>
+        <input type="file" id="long-file" accept="video/*" style="display:none" onchange="fileSelected(this,'long')"/>
+      </div>
+
+      <!-- Shorts -->
+      <div class="sched-card">
+        <h3><i class="ti ti-device-mobile"></i> Shorts (3-7x/week)</h3>
+        <div class="section-lbl">Upload Days (select multiple)</div>
+        <div class="sched-week" id="short-days">
+          <div class="sched-day on" data-day="Mon" onclick="togDay(this,'short')"><div class="d-name">M</div><div class="d-icon">📱</div></div>
+          <div class="sched-day" data-day="Tue" onclick="togDay(this,'short')"><div class="d-name">T</div><div class="d-icon">📱</div></div>
+          <div class="sched-day on" data-day="Wed" onclick="togDay(this,'short')"><div class="d-name">W</div><div class="d-icon">📱</div></div>
+          <div class="sched-day" data-day="Thu" onclick="togDay(this,'short')"><div class="d-name">T</div><div class="d-icon">📱</div></div>
+          <div class="sched-day on" data-day="Fri" onclick="togDay(this,'short')"><div class="d-name">F</div><div class="d-icon">📱</div></div>
+          <div class="sched-day on" data-day="Sat" onclick="togDay(this,'short')"><div class="d-name">S</div><div class="d-icon">📱</div></div>
+          <div class="sched-day" data-day="Sun" onclick="togDay(this,'short')"><div class="d-name">S</div><div class="d-icon">📱</div></div>
+        </div>
+        <div class="field"><label>Upload Time (bawat shorts)</label><input type="time" id="short-time" value="18:00"/></div>
+        <div class="upload-area" id="short-drop" onclick="document.getElementById('short-file').click()" ondragover="dragOver(event,this)" ondragleave="dragLeave(this)" ondrop="handleDrop(event,'short')">
+          <i class="ti ti-device-mobile-upload"></i>
+          <p id="short-fn">I-click o i-drag ang mga shorts dito</p>
+          <small>Vertical video 9:16 • Max 60 secs each</small>
+          <div class="progress-bar" id="short-prog-bar" style="display:none"><div class="progress-fill" id="short-prog"></div></div>
+        </div>
+        <input type="file" id="short-file" accept="video/*" multiple style="display:none" onchange="fileSelected(this,'short')"/>
+      </div>
+    </div>
+
+    <!-- Video Metadata -->
+    <div class="card" style="margin-bottom:14px">
+      <div style="font-size:14px;font-weight:700;margin-bottom:14px">Video Details</div>
+      <div class="row2">
+        <div class="field"><label>Long Video Title</label><input id="ap-long-title" placeholder="e.g. Ganito Ako Kumita ng ₱50k sa YouTube sa 30 Days!"/></div>
+        <div class="field"><label>Privacy</label>
+          <select id="ap-privacy"><option value="public">Public</option><option value="unlisted">Unlisted</option><option value="private">Private (draft)</option></select>
+        </div>
+      </div>
+      <div class="field"><label>Long Video Description (optional — or generate from Title & Desc tool)</label>
+        <textarea id="ap-long-desc" placeholder="I-paste ang generated description dito..."></textarea>
+      </div>
+      <div class="field"><label>Tags (comma separated)</label><input id="ap-tags" placeholder="e.g. youtube tips, paano kumita, monetization Philippines..."/></div>
+      <div class="field"><label>Shorts Title Template</label><input id="ap-short-title" placeholder="e.g. Quick Tip: {tip} #shorts #youtube"/></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="btn-upload-long" onclick="uploadVideo('long')"><i class="ti ti-send"></i> Upload Long Video</button>
+      <button class="btn btn-g" id="btn-upload-short" onclick="uploadVideo('short')"><i class="ti ti-device-mobile"></i> Upload Shorts</button>
+    </div>
+
+    <div class="res-box" id="res-upload" style="margin-top:14px"><div class="res-empty">I-upload ang files at i-click ang button para mag-post sa YouTube...</div></div>
+  </div>
+</div>
+
+</main><!-- /main -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+const state = {
+  ytToken: null,
+  ytProfile: null,
+  selectedCharStyle: '2D Cartoon',
+  longFile: null,
+  shortFiles: []
+};
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  // Check for OAuth callback params
+  const params = new URLSearchParams(window.location.search);
+  const authParam = params.get('auth');
+  const errorParam = params.get('error');
+
+  if (authParam) {
+    try {
+      const { tokens, profile } = JSON.parse(decodeURIComponent(authParam));
+      state.ytToken = tokens.access_token;
+      state.ytProfile = profile;
+      sessionStorage.setItem('yt_token', tokens.access_token);
+      sessionStorage.setItem('yt_profile', JSON.stringify(profile));
+      updateYTUI();
+      window.history.replaceState({}, '', '/');
+      toast('YouTube account connected!', 'ok');
+    } catch(e) { toast('Auth parse error', 'err'); }
+  }
+  if (errorParam) {
+    toast('YouTube auth failed: ' + decodeURIComponent(errorParam), 'err');
+    window.history.replaceState({}, '', '/');
+  }
+
+  // Restore session
+  const savedToken = sessionStorage.getItem('yt_token');
+  const savedProfile = sessionStorage.getItem('yt_profile');
+  if (savedToken && savedProfile) {
+    state.ytToken = savedToken;
+    state.ytProfile = JSON.parse(savedProfile);
+    updateYTUI();
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════
+const navMap = ['niche','scenario','character','p2v','voice','titledesc','thumbnail','copyright','autopost'];
+function go(name) {
+  document.querySelectorAll('.nav-item').forEach((el, i) => el.classList.toggle('active', navMap[i] === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('p-' + name).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  YOUTUBE AUTH
+// ═══════════════════════════════════════════════════════════
+async function ytLogin() {
+  try {
+    const r = await fetch('/.netlify/functions/yt-auth');
+    const d = await r.json();
+    if (d.url) window.location.href = d.url;
+    else toast('Error: ' + (d.error || 'Cannot get auth URL'), 'err');
+  } catch(e) { toast('Auth error: ' + e.message, 'err'); }
+}
+
+function updateYTUI() {
+  const p = state.ytProfile;
+  if (!p) return;
+  document.getElementById('yt-login-btn').style.display = 'none';
+  document.getElementById('yt-user-display').style.display = 'flex';
+  document.getElementById('yt-avatar').src = p.picture || '';
+  document.getElementById('yt-uname').textContent = p.name?.split(' ')[0] || 'User';
+  document.getElementById('autopost-noauth').style.display = 'none';
+  document.getElementById('autopost-auth').style.display = 'block';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CHIP HELPER
+// ═══════════════════════════════════════════════════════════
+function chip(el, fieldId) {
+  const field = document.getElementById(fieldId);
+  const cur = field.value.trim();
+  const val = el.textContent.trim();
+  el.classList.toggle('on');
+  if (el.classList.contains('on')) {
+    field.value = cur ? cur + ', ' + val : val;
+  } else {
+    field.value = cur.split(', ').filter(x => x !== val).join(', ');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  STYLE SELECTOR (Character)
+// ═══════════════════════════════════════════════════════════
+function selStyle(el) {
+  document.querySelectorAll('#char-styles .style-opt').forEach(o => o.classList.remove('on'));
+  el.classList.add('on');
+  state.selectedCharStyle = el.dataset.style;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  AI GENERATE (calls Netlify function)
+// ═══════════════════════════════════════════════════════════
+const btnLabels = {
+  niche:     '<i class="ti ti-sparkles"></i> Find My Profitable Niche',
+  scenario:  '<i class="ti ti-sparkles"></i> Generate Hook + Full Script',
+  character: '<i class="ti ti-sparkles"></i> Generate Brand Guide',
+  p2v:       '<i class="ti ti-sparkles"></i> Generate Video Prompts',
+  voice:     '<i class="ti ti-sparkles"></i> Analyze Voice + Create AI Style Guide',
+  titledesc: '<i class="ti ti-sparkles"></i> Generate 5 Titles + Full Description',
+  thumbnail: '<i class="ti ti-sparkles"></i> Get Detailed Design Guide',
+  copyright: '<i class="ti ti-shield-check"></i> Check for Issues'
+};
+
+async function gen(type) {
+  const btnId = 'btn-' + (type === 'character' ? 'char-guide' : type === 'thumbnail' ? 'thumb-text' : type);
+  const resId = 'res-' + type;
+  const cpId  = 'cp-' + type;
+  const prompt = buildPrompt(type);
+  if (!prompt) return;
+
+  const btn = document.getElementById(btnId);
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Generating...';
+
+  try {
+    const r = await fetch('/.netlify/functions/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    showResult(resId, cpId, d.result);
+    toast('Generated!', 'ok');
+  } catch(e) {
+    showResult(resId, cpId, '⚠️ Error: ' + e.message);
+    toast(e.message, 'err');
+  }
+  btn.disabled = false;
+  btn.innerHTML = btnLabels[type] || '<i class="ti ti-sparkles"></i> Generate';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PROMPT BUILDER
+// ═══════════════════════════════════════════════════════════
+function v(id) { return (document.getElementById(id)?.value || '').trim(); }
+
+function buildPrompt(type) {
+  const base = 'Sagutin sa Taglish (natural na mix ng Tagalog at English na relatable sa mga Pilipino). Maging specific, creative, at actionable. May emojis minsan.\n\n';
+  switch(type) {
+
+    case 'niche': return base + `Ikaw ay isang expert YouTube niche strategist para sa Pilipinong creators.
+Interests: "${v('nf-interests')}"
+Skills: "${v('nf-skills')}"
+Available time: ${v('nf-time')}
+Budget: ${v('nf-budget')}
+Priority: ${v('nf-priority')}
+
+GAWIN:
+1. TOP 3 NICHE RECOMMENDATIONS — ranked by monetization potential para sa Filipino market
+   Bawat niche: Competitiveness (Low/Med/High), Estimated CPM, Bakit angkop sa creator, Sample channels na kumikita dito
+2. PINAKA-RECOMMENDED NICHE — detailed analysis kung bakit ito ang pinaka-tamang niche
+3. SUB-NICHE IDEAS — 5 specific na sub-niches na mas madaling maabot at mas mababa ang competition
+4. MONETIZATION TIMELINE — realistic na projection: month 1, month 3, month 6, month 12
+5. CONTENT PLAN — unang 10 videos para sa pinaka-recommended na niche (may title at brief description bawat isa)
+6. COMPETITION GAP — anong wala pa sa current Filipino creators sa niche na ito na pwede mong gawin`;
+
+    case 'scenario': return base + `Ikaw ay isang professional Filipino YouTube scriptwriter.
+Concept: "${v('sc-concept')}"
+Format: ${v('sc-format')}
+Length: ${v('sc-len')}
+Tone: ${v('sc-tone')}
+Message: "${v('sc-msg')}"
+
+GUMAWA NG:
+
+🎬 HOOK OPTIONS (3-6 seconds each) — gumawa ng 3 different hooks:
+• HOOK 1 (Curiosity/Question): [exact na sasabihin]
+• HOOK 2 (Shocking statement): [exact na sasabihin]  
+• HOOK 3 (Story opener): [exact na sasabihin]
+[Para sa bawat hook: ipaliwanag kung bakit ito epektibo at sino ang pinaka-target na viewer]
+
+📋 FULL SCRIPT:
+HOOK (0:00-0:06) — [pinaka-recommended hook + visual direction]
+INTRO (0:06-0:45) — [exact dialogue, hindi matagal na intro]
+MAIN SECTION 1 (timestamp) — [detailed script + B-roll suggestions]
+MAIN SECTION 2 (timestamp) — [detailed script]  
+MAIN SECTION 3 (timestamp) — [climax/reveal]
+OUTRO + CTA (last 30s) — [exact na sasabihin para sa engagement]
+
+🎥 PRODUCTION NOTES — 5 tips para sa solo creator`;
+
+    case 'character': return base + `Ikaw ay isang YouTube brand strategist.
+Name: "${v('ch-name')}"
+Niche: "${v('ch-niche')}"
+Style: ${state.selectedCharStyle}
+Personality: "${v('ch-personality')}"
+Colors: "${v('ch-colors') || 'hindi pa pinili'}"
+Features: "${v('ch-features') || 'wala pa'}"
+
+COMPLETE CHARACTER BRAND GUIDE:
+1. CHARACTER NAME & TAGLINE — final recommendation at catchy tagline
+2. PERSONALITY PROFILE — detailed character description, quirks, backstory
+3. VISUAL IDENTITY — exact colors (hex codes), fonts, logo concept, wardrobe
+4. CONTENT VOICE — paano nagsasalita, 10 signature phrases, tone guide
+5. CONTENT PILLARS — 4 recurring content types na fits ang character
+6. CHANNEL ABOUT SECTION — ready-to-paste channel description
+7. ${state.selectedCharStyle} STYLE PROMPT — optimized prompt para sa Midjourney/DALL-E para ma-generate ang character sa ${state.selectedCharStyle} style`;
+
+    case 'p2v': return base + `Ikaw ay isang expert AI video prompt engineer.
+Concept: "${v('p2v-concept')}"
+Style: ${v('p2v-style')}
+Mood: "${v('p2v-mood')}"
+Duration: ${v('p2v-dur')}
+AI Tool: ${v('p2v-tool')}
+
+GUMAWA NG:
+1. MAIN PROMPT para sa ${v('p2v-tool')} — optimized, detailed, ready to use
+2. SHOT-BY-SHOT BREAKDOWN — 5-8 individual shots na may:
+   • Shot description (exact na makikita sa screen)
+   • Camera movement (pan, zoom, static, etc.)
+   • Duration ng shot
+   • Specific prompt para sa shot na ito
+3. STYLE REFERENCE KEYWORDS — para sa consistent visuals
+4. NEGATIVE PROMPTS — anong dapat i-exclude para mas maganda ang output
+5. TIPS — paano mapabuti ang results sa specific na AI tool na ito
+6. ALTERNATIVE TOOLS — kung hindi available ang ${v('p2v-tool')}, anong pwedeng gamitin`;
+
+    case 'voice': return base + `Ikaw ay isang brand voice analyst.
+Sample: "${v('v-sample') || 'walang sample'}"
+Niche: "${v('v-niche')}"
+Inspiration: "${v('v-inspo') || 'wala'}"
+Language: ${v('v-lang')}
+
+COMPLETE AI VOICE STYLE GUIDE:
+1. VOICE FINGERPRINT — energy level (1-10), pacing, emotional range, unique patterns
+2. SIGNATURE PHRASES — 12 phrases characteristic sa kanya para sa: opening, reacting, explaining, closing
+3. VOCABULARY — 20 words/expressions DAPAT gamitin + 10 HINDI dapat gamitin
+4. SCRIPTING TEMPLATES:
+   • Video opener template (first 30 seconds) — may fill-in-the-blank
+   • Transition template — para sa pagitan ng sections
+   • Outro template — para sa consistent ending
+5. AI SYSTEM PROMPT — exact prompt para i-set sa ChatGPT/Claude para laging nasa kanyang boses ang generated content:
+---
+[EXACT AI SYSTEM PROMPT DITO]
+---
+6. ELEVENLABS VOICE SETUP — paano i-describe ang boses para sa voice cloning`;
+
+    case 'titledesc': return base + `Ikaw ay isang YouTube SEO specialist.
+Content: "${v('td-content')}"
+Primary keyword: "${v('td-kw1') || 'wala'}"
+Secondary keyword: "${v('td-kw2') || 'wala'}"
+Tone: ${v('td-tone')}
+Duration: ${v('td-dur') || '10 minutes'}
+CTA: ${v('td-cta')}
+
+GUMAWA NG:
+1. 5 TITLE OPTIONS — iba-ibang approach, lahat may high-CTR potential
+   Format: "[Title]" — [character count] chars — [bakit ito effective]
+   
+2. FULL VIDEO DESCRIPTION:
+   [Hook first line — may keyword, pumipigil sa scroll]
+   
+   [Body — 150-180 words, natural, engaging, may keywords]
+   
+   📌 TIMESTAMPS:
+   [6-8 timestamps na may placeholders]
+   
+   🔗 LINKS:
+   [Subscribe, socials, related video placeholders]
+   
+   #hashtags (15 total — mix ng broad, niche, at Filipino hashtags)
+
+3. SEO CHECKLIST — 5 additional optimization tips para sa video na ito`;
+
+    case 'thumbnail': return base + `Ikaw ay isang expert YouTube thumbnail designer.
+Topic: "${v('th-topic')}"
+Emotion: "${v('th-emotion') || 'curiosity'}"
+Style: ${v('th-style')}
+Colors: ${v('th-color')}
+Presenter: ${v('th-person')}
+
+3 THUMBNAIL CONCEPTS:
+
+CONCEPT 1 — MAIN (pinaka-recommended):
+• Layout: [exact composition — kung saan ang bawat element]
+• ${v('th-person').startsWith('Oo') ? 'Expression/Pose: [specific na expression at body language]' : 'Main visual: [exact description]'}
+• TEXT OVERLAY: "[EXACT WORDS]" — [font style, placement, size]
+• Colors: Background [hex], Text [hex], Accent [hex]
+• Props/Background: [specific setup]
+• Bakit ito mag-wo-work: [psychology]
+• Canva tips: [3 specific Canva steps]
+
+CONCEPT 2 — ALTERNATIVE:
+[Shorter description, different approach]
+TEXT: "[EXACT WORDS]"
+
+CONCEPT 3 — A/B TEST VERSION:
+[Different angle, para ma-test vs Concept 1]
+TEXT: "[EXACT WORDS]"
+
+BONUS: 5 thumbnail rules para sa Pilipinong audience`;
+
+    case 'copyright': return base + `Ikaw ay isang YouTube content compliance advisor.
+Content type: ${v('cr-type')}
+Topic: "${v('cr-topic') || 'hindi tinukoy'}"
+Content:
+---
+${v('cr-text') || 'Walang content'}
+---
+
+COMPREHENSIVE COPYRIGHT & FACT CHECK REPORT:
+
+⚠️ OVERALL RISK LEVEL: [LOW / MEDIUM / HIGH / CRITICAL]
+
+1. COPYRIGHT ANALYSIS:
+   • Specific na risky parts (i-quote at i-explain ang risk)
+   • Uri ng potential copyright issue
+   • Possible YouTube consequence (strike, demonetization, etc.)
+
+2. FACT CHECK:
+   • Bawat factual claim — ✅ VERIFIED / ⚠️ UNVERIFIED / ❌ POSSIBLY FALSE
+   • Explanation at tamang information
+
+3. YOUTUBE POLICY CHECK:
+   • Community Guidelines issues (kung mayroon)
+   • Monetization eligibility concerns
+
+4. SPECIFIC FIXES:
+   • Exact na changes para maging safe
+   • Alternative wording para sa risky parts
+
+5. FREE SAFE RESOURCES:
+   • Libre na music sources (YouTube Audio Library, Epidemic Sound free tier)
+   • Libre na image sources (Unsplash, Pexels, Pixabay)
+   • Copyright-free footage (Coverr, Mixkit)`;
+
+    default: return null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  IMAGE GENERATION (Pollinations.ai — FREE, no API key)
+// ═══════════════════════════════════════════════════════════
+async function genCharImage() {
+  const name = v('ch-name') || 'YouTube character';
+  const niche = v('ch-niche') || 'content creator';
+  const personality = v('ch-personality') || 'friendly';
+  const colors = v('ch-colors') || 'vibrant';
+  const features = v('ch-features') || '';
+  const style = state.selectedCharStyle;
+
+  const styleMap = {
+    '2D Cartoon': 'flat 2D cartoon illustration, vector art style, colorful',
+    '3D Render': 'high quality 3D rendered character, CGI, smooth lighting, Pixar style',
+    'Clay/Claymation': 'claymation character, stop motion style, clay texture, handcrafted look',
+    'Retro/Pixel Art': 'pixel art character, retro 8-bit game style, pixelated',
+    'Anime/Manga': 'anime character, manga art style, cel shaded, Japanese animation'
+  };
+
+  const styleDesc = styleMap[style] || '2D cartoon';
+  const prompts = [
+    `${styleDesc}, YouTube content creator character named ${name}, ${niche} themed, ${personality} personality, ${colors} color scheme, ${features}, white background, character design sheet`,
+    `${styleDesc}, cute mascot character, ${niche} content creator, ${personality}, wearing ${features || 'casual outfit'}, ${colors}, professional character design, front view`,
+    `${styleDesc}, ${name} YouTube channel mascot, ${niche} themed outfit, ${personality} expression, ${colors} palette, ${features}, clean background, logo-ready design`
+  ];
+
+  const btn = document.getElementById('btn-char-img');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Generating...';
+
+  const grid = document.getElementById('char-img-grid');
+  document.getElementById('char-img-area').style.display = 'block';
+  grid.innerHTML = prompts.map((_, i) => `<div class="img-card"><div style="width:100%;aspect-ratio:1;background:var(--bg);display:flex;align-items:center;justify-content:center"><span class="spin" style="border-color:rgba(0,0,0,.2);border-top-color:var(--red)"></span></div><div class="img-card-label">Generating ${style} #${i+1}...</div></div>`).join('');
+
+  await Promise.all(prompts.map(async (p, i) => {
+    const encoded = encodeURIComponent(p);
+    const seed = Math.floor(Math.random() * 99999);
+    const url = `https://image.pollinations.ai/prompt/${encoded}?width=512&height=512&seed=${seed}&nologo=true`;
+    const card = grid.children[i];
+    card.children[0].innerHTML = `<img src="${url}" alt="Character ${i+1}" onerror="this.parentElement.innerHTML='<div style=padding:20px;color:var(--txt3);font-size:12px>Image generation failed. Try again.</div>'"/>`;
+    card.children[1].textContent = `${style} Concept #${i+1}`;
+  }));
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ti ti-photo"></i> Generate Character Images';
+  toast('Character images generated!', 'ok');
+}
+
+async function genThumbImage() {
+  const topic = v('th-topic');
+  const style = v('th-style');
+  const colors = v('th-color');
+  const emotion = v('th-emotion') || 'excited';
+
+  const colorMap = {
+    'Bright & energetic (red, yellow)': 'bright red yellow orange high energy',
+    'Dark & cinematic': 'dark cinematic black deep colors dramatic',
+    'Pastel / Aesthetic': 'soft pastel colors aesthetic minimal',
+    'High contrast B&W': 'black and white high contrast dramatic',
+    'Natural / Warm': 'warm natural brown beige cozy tones'
+  };
+
+  const styleMap = {
+    'Shocked reaction face': 'person with shocked surprised open mouth expression',
+    'Before & After': 'before and after split comparison graphic',
+    'Bold text overlay': 'bold text typography graphic design',
+    'Minimalist': 'clean minimal design simple layout',
+    'Split screen': 'split screen two sided comparison',
+    'Collage': 'photo collage multiple images grid'
+  };
+
+  const prompts = [
+    `YouTube thumbnail, ${styleMap[style] || style}, ${topic}, ${colorMap[colors] || colors}, ${emotion} mood, professional design, high CTR, vibrant, 16:9 ratio`,
+    `YouTube thumbnail design, ${topic}, ${colorMap[colors] || colors}, eye-catching, bold, ${emotion}, click-worthy design, professional`
+  ];
+
+  const btn = document.getElementById('btn-thumb-img');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Previewing...';
+
+  const area = document.getElementById('thumb-img-area');
+  const grid = document.getElementById('thumb-img-grid');
+  area.style.display = 'block';
+  grid.innerHTML = prompts.map((_, i) => `<div class="img-card"><div style="width:100%;aspect-ratio:16/9;background:var(--bg);display:flex;align-items:center;justify-content:center"><span class="spin" style="border-color:rgba(0,0,0,.2);border-top-color:var(--red)"></span></div><div class="img-card-label">Generating preview ${i+1}...</div></div>`).join('');
+
+  await Promise.all(prompts.map(async (p, i) => {
+    const seed = Math.floor(Math.random() * 99999);
+    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=640&height=360&seed=${seed}&nologo=true`;
+    const card = grid.children[i];
+    card.children[0].innerHTML = `<img src="${url}" alt="Thumbnail ${i+1}" style="aspect-ratio:16/9" onerror="this.parentElement.innerHTML='<div style=padding:20px;font-size:12px;color:var(--txt3)>Preview failed</div>'"/>`;
+    card.children[1].textContent = `Concept ${i+1} — Click "Design Guide" for full details`;
+  }));
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ti ti-photo"></i> Preview Thumbnail Concept';
+  toast('Thumbnail previews generated!', 'ok');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  VIDEO UPLOAD (YouTube)
+// ═══════════════════════════════════════════════════════════
+function dragOver(e, el) { e.preventDefault(); el.classList.add('drag'); }
+function dragLeave(el) { el.classList.remove('drag'); }
+function handleDrop(e, type) {
+  e.preventDefault();
+  document.getElementById(type + '-drop').classList.remove('drag');
+  const files = e.dataTransfer.files;
+  if (type === 'long') { state.longFile = files[0]; updateFileUI('long', files[0].name); }
+  else { state.shortFiles = Array.from(files); updateFileUI('short', `${files.length} file(s) selected`); }
+}
+function fileSelected(input, type) {
+  if (type === 'long') { state.longFile = input.files[0]; updateFileUI('long', input.files[0].name); }
+  else { state.shortFiles = Array.from(input.files); updateFileUI('short', `${input.files.length} file(s) selected`); }
+}
+function updateFileUI(type, name) {
+  document.getElementById(type + '-fn').textContent = '✅ ' + name;
+}
+
+async function uploadVideo(type) {
+  if (!state.ytToken) { toast('I-connect muna ang YouTube account!', 'err'); return; }
+  const file = type === 'long' ? state.longFile : state.shortFiles[0];
+  if (!file) { toast('Walang video na na-select!', 'err'); return; }
+
+  const title = type === 'long'
+    ? (v('ap-long-title') || 'My Video')
+    : (v('ap-short-title') || 'Short Video #shorts');
+  const description = v('ap-long-desc') || '';
+  const tags = v('ap-tags').split(',').map(t => t.trim()).filter(Boolean);
+
+  const btn = document.getElementById('btn-upload-' + (type === 'long' ? 'long' : 'short'));
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Uploading...';
+
+  const progBar = document.getElementById(type + '-prog-bar');
+  const prog = document.getElementById(type + '-prog');
+  progBar.style.display = 'block';
+
+  try {
+    // Step 1: Get resumable upload URI from Netlify function
+    const initR = await fetch('/.netlify/functions/yt-upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.ytToken}` },
+      body: JSON.stringify({ title, description, tags, privacyStatus: v('ap-privacy') || 'public', fileSize: file.size, mimeType: file.type })
+    });
+    const initD = await initR.json();
+    if (initD.error) throw new Error(initD.error);
+    const uploadUri = initD.uploadUri;
+
+    // Step 2: Upload file directly from browser using XMLHttpRequest for progress
+    await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('PUT', uploadUri, true);
+      xhr.setRequestHeader('Content-Type', file.type);
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          const pct = Math.round(e.loaded / e.total * 100);
+          prog.style.width = pct + '%';
+        }
+      };
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) resolve(JSON.parse(xhr.responseText));
+        else reject(new Error(`Upload failed: HTTP ${xhr.status}`));
+      };
+      xhr.onerror = () => reject(new Error('Network error during upload'));
+      xhr.send(file);
+    }).then(videoData => {
+      const vid = videoData.id;
+      showResult('res-upload', null, `✅ Upload successful!\n\nVideo ID: ${vid}\nURL: https://youtube.com/watch?v=${vid}\nTitle: "${title}"\nStatus: ${v('ap-privacy')}\n\n${type === 'short' && state.shortFiles.length > 1 ? `Note: ${state.shortFiles.length - 1} more shorts to upload. I-repeat ang process para sa bawat isa.` : 'Video is now processing on YouTube. It may take a few minutes before it appears on your channel.'}`);
+      toast('Video uploaded!', 'ok');
+      prog.style.width = '100%';
+    });
+  } catch(e) {
+    showResult('res-upload', null, '⚠️ Upload failed: ' + e.message + '\n\nPossible reasons:\n• Expired token — i-reconnect ang YouTube account\n• File too large o wrong format\n• Insufficient YouTube permissions');
+    toast('Upload failed: ' + e.message, 'err');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = type === 'long' ? '<i class="ti ti-send"></i> Upload Long Video' : '<i class="ti ti-device-mobile"></i> Upload Shorts';
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SCHEDULER DAY TOGGLE
+// ═══════════════════════════════════════════════════════════
+function togDay(el, type) {
+  if (type === 'long') {
+    document.querySelectorAll('#long-days .sched-day').forEach(d => d.classList.remove('on'));
+    el.classList.add('on');
+  } else {
+    el.classList.toggle('on');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RESULT HELPERS
+// ═══════════════════════════════════════════════════════════
+function showResult(resId, cpId, text) {
+  const box = document.getElementById(resId);
+  if (!box) return;
+  box.innerHTML = '<div class="res-content">' + esc(text) + '</div>';
+  if (cpId) { const cp = document.getElementById(cpId); if (cp) cp.classList.add('on'); }
+}
+
+function copyRes(resId, btn) {
+  const text = document.getElementById(resId)?.querySelector('.res-content')?.innerText || '';
+  if (!text) { toast('Walang content', 'err'); return; }
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="ti ti-check"></i> Copied!';
+    toast('Copied to clipboard!', 'ok');
+    setTimeout(() => { btn.innerHTML = orig; }, 2000);
+  });
+}
+
+function esc(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ═══════════════════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════════════════
+let toastTimer;
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast on ' + (type === 'ok' ? 'ok' : type === 'err' ? 'err' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = 'toast'; }, 3500);
+}
+</script>
+</body>
+</html>
